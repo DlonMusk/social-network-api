@@ -1,12 +1,12 @@
 const {User} = require('../models');
 
+
 module.exports = {
     // Get all users
     getUsers(req, res){
         User.find()
             .select('-__v')
-            .populate('friends')
-            .populate('thoughts')
+            .populate({path: 'friends', select: '-thoughts'})
             .then(users => res.json(users))
             .catch(err => {
                 console.log(err);
@@ -56,7 +56,16 @@ module.exports = {
             })
     },
     // Add new friend
-    addNewFriend(req, res){
+    async addNewFriend(req, res){
+        const currentId = await User.findById(req.params.userId)
+                         .then(user => user.id);
+
+        // cannot add yourself
+        if(currentId === req.params.userId){
+            res.json('cannot add yourself as a friend')
+            return;
+        }
+
         User.findByIdAndUpdate(
             req.params.userId,
             {$addToSet: {friends: req.params.friendId}}, {runValidators: true, new: true})

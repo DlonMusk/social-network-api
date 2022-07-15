@@ -5,6 +5,7 @@ module.exports = {
     // Get all thoughts
     getThoughts(req, res) {
         Thought.find()
+            .select('-__v')
             .then(thoughts => res.status(200).json(thoughts))
             .catch(err => {
                 console.log(err);
@@ -35,7 +36,7 @@ module.exports = {
                     req.body.userId,
                     { $addToSet: { thoughts: thought.id } },
                     { runValidators: true, new: true });
-                    res.status(200).json(thought);
+                res.status(200).json(thought);
             })
             .catch(err => {
                 console.log(err);
@@ -45,7 +46,7 @@ module.exports = {
     // Update thought
     updateThought(req, res) {
         Thought.findByIdAndUpdate(
-            req.params.userId,
+            req.params.thoughtId,
             req.body,
             { runValidators: true, new: true })
             .then(updatedThought => res.status(200).json(updatedThought))
@@ -77,7 +78,7 @@ module.exports = {
     removeReaction(req, res) {
         Thought.findByIdAndUpdate(
             req.params.thoughtId,
-            { $pull: { reactions: req.params.reactionId } })
+            { $pull: { reactions: { reactionId: req.params.reactionId } } })
             .then(thought => res.status(200).json(thought))
             .catch(err => {
                 console.log(err);
