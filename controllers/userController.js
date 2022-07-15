@@ -7,6 +7,7 @@ module.exports = {
         User.find()
             .select('-__v')
             .populate({path: 'friends', select: '-thoughts'})
+            .populate({path: 'thoughts', select: '-__v'})
             .then(users => res.json(users))
             .catch(err => {
                 console.log(err);
@@ -61,7 +62,8 @@ module.exports = {
                          .then(user => user.id);
 
         // cannot add yourself
-        if(currentId === req.params.userId){
+        console.log(currentId, req.params.userId)
+        if(currentId === req.params.friendId){
             res.json('cannot add yourself as a friend')
             return;
         }

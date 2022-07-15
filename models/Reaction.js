@@ -1,9 +1,7 @@
 const { Schema } = require('mongoose');
 const { ObjectId } = require('mongoose').Types;
+const moment = require('moment');
 
-const formatTime = function(createdAt) {
-    return createdAt.toLocaleString('en-US')
-}
 
 const reactionSchema = new Schema(
     {
@@ -22,8 +20,14 @@ const reactionSchema = new Schema(
         },
         createdAt: {
             type: Date,
-            default: new Date(),
-            get: formatTime
+            default: Date.now,
+            get: (createdAtVal) => moment(createdAtVal).format('MMM DD, YYYY [at] hh:mm a')
+
+        }
+    },
+    {
+        toJson: {
+            getters: true
         }
     }
 );
